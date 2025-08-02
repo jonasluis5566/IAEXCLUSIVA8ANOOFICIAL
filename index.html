@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>8º Ano IA Exclusiva 😝</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:#fafafa;height:100vh;display:flex;flex-direction:column}
+    .header{background:#fff;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,.1);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+    .logo{font-size:18px;font-weight:600;color:#1a73e8;display:flex;align-items:center;gap:8px}
+    .fab-btn{width:40px;height:40px;background:#1a73e8;color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer}
+    .floating-menu{position:absolute;left:12px;top:55px;background:#fff;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.15);padding:6px 0;display:none;z-index:999;min-width:180px}
+    .floating-menu.show{display:block}
+    .menu-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;color:#5f6368;font-size:14px}
+    .menu-item:hover{background:#f8f9fa;color:#1a73e8}
+    .chat-wrapper{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .chat-container{flex:1;padding:12px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;scroll-behavior:smooth}
+    .message{display:flex;gap:8px;max-width:85%;animation:fadeIn 0.3s ease-in}
+    .message.user{align-self:flex-end;flex-direction:row-reverse}
+    .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .message.user .avatar{background:#1a73e8;color:#fff}
+    .message.bot .avatar{background:#e0e0e0;color:#333}
+    .message-content{background:#e0e0e0;padding:12px 16px;border-radius:18px;font-size:15px;line-height:1.4;word-break:break-word}
+    .message.user .message-content{background:#d1e5ff;color:#0d47a1}
+    .input-wrapper{position:sticky;bottom:0;background:#fff;border-top:1px solid #e0e0e0;padding:12px;display:flex;align-items:flex-end;gap:8px}
+    .input-box{flex:1;border:1px solid #e0e0e0;border-radius:24px;padding:12px 16px;font-size:16px;resize:none;max-height:120px;background:#f1f3f4;border:none;outline:none}
+    .send-btn{width:44px;height:44px;background:#1a73e8;color:#fff;border:none;border-radius:50%;cursor:pointer}
+
+    /* Animação de digitando */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #e0e0e0;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 3px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #999;
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .typing-dot:nth-child(3) { animation-delay: 0s; }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-10px); opacity: 1; }
+    }
+
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center}
+    .modal.show{display:flex}
+    .modal-content{background:#fff;border-radius:12px;padding:20px;width:90%;max-width:380px;max-height:90vh;overflow-y:auto;z-index:2001}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;font-size:16px}
+    .close-btn{background:none;border:none;font-size:22px;cursor:pointer;color:#5f6368}
+    .form-group{margin-bottom:12px}
+    .form-control{width:100%;padding:10px;border:1px solid #e0e0e0;border-radius:8px;font-size:14px}
+    .btn-group{display:flex;gap:8px;margin-top:15px}
+    .btn{flex:1;padding:10px;border:none;border-radius:8px;font-size:14px;cursor:pointer}
+    .btn-primary{background:#1a73e8;color:#fff}
+    .btn-secondary{background:#f1f3f4;color:#5f6368}
+  </style>
+</head>
+<body>
+  <header class="header">
+    <button class="fab-btn" onclick="toggleMenu()"><i class="fas fa-plus"></i></button>
+    <div class="logo">😝 8º Ano IA Exclusiva</div>
+  </header>
+
+  <div class="floating-menu" id="floatingMenu">
+    <div class="menu-item" onclick="openModal('resumo')"><i class="fas fa-file-alt"></i><span>Criar Resumo</span></div>
+    <div class="menu-item" onclick="openModal('exercicio')"><i class="fas fa-calculator"></i><span>Resolver Exercício</span></div>
+    <div class="menu-item" onclick="openModal('quiz')"><i class="fas fa-trophy"></i><span>Gerar Quiz</span></div>
+    <div class="menu-item" onclick="openModal('video')"><i class="fas fa-play-circle"></i><span>Buscar Vídeo</span></div>
+    <div class="menu-item" onclick="openModal('slide')"><i class="fas fa-slideshare"></i><span>Criar Slides</span></div>
+    <div class="menu-item" onclick="openModal('camera')"><i class="fas fa-camera"></i><span>Resolver por Foto</span></div>
+  </div>
+
+  <div class="chat-wrapper">
+    <main class="chat-container" id="chat" role="main">
+      <div class="message bot">
+        <div class="avatar"><i class="fas fa-robot"></i></div>
+        <div class="message-content">E aí, inútil… cochilou na aula e agora precisa de mim, né? Fica frio aí que eu te ajudo. 🤦‍♂️</div>
+      </div>
+    </main>
+  </div>
+
+  <div class="input-wrapper">
+    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)" aria-label="Upload de imagem">
+    <button class="send-btn" onclick="document.getElementById('fileInput').click()" title="Enviar foto" aria-label="Enviar foto">
+      <i class="fas fa-camera"></i>
+    </button>
+    <textarea class="input-box" id="message-input" placeholder="Digite sua pergunta..." rows="1" aria-label="Mensagem"></textarea>
+    <button class="send-btn" onclick="sendMessage()" aria-label="Enviar mensagem">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+
+  <!-- MODAIS -->
+  <div class="modal" id="resumoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>Criar Resumo</span>
+        <button class="close-btn" onclick="closeModal('resumoModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>Matéria:</label>
+        <input type="text" class="form-control" id="resumoMateria" placeholder="Matemática">
+      </div>
+      <div class="form-group">
+        <label>Tema:</label>
+        <input type="text" class="form-control" id="resumoTema" placeholder="Frações">
+      </div>
+      <div class="form-group">
+        <label>Linhas:</label>
+        <input type="number" class="form-control" id="resumoLinhas" placeholder="10" min="1">
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="gerarResumo()">Criar</button>
+        <button class="btn btn-secondary" onclick="closeModal('resumoModal')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="exercicioModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>Resolver Exercício</span>
+        <button class="close-btn" onclick="closeModal('exercicioModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>Matéria:</label>
+        <input type="text" class="form-control" id="exercicioMateria" placeholder="Física">
+      </div>
+      <div class="form-group">
+        <label>Exercício:</label>
+        <textarea class="form-control" id="exercicioTexto" rows="4" placeholder="Cole o exercício aqui"></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="resolverEx()">Resolver</button>
+        <button class="btn btn-secondary" onclick="closeModal('exercicioModal')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="quizModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>Gerar Quiz</span>
+        <button class="close-btn" onclick="closeModal('quizModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>Matéria:</label>
+        <input type="text" class="form-control" id="quizMateria" placeholder="História">
+      </div>
+      <div class="form-group">
+        <label>Tema:</label>
+        <input type="text" class="form-control" id="quizTema" placeholder="Revolução Francesa">
+      </div>
+      <div class="form-group">
+        <label>Quantidade:</label>
+        <input type="number" class="form-control" id="quizQtd" placeholder="5" min="1">
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="gerarQuiz()">Gerar</button>
+        <button class="btn btn-secondary" onclick="closeModal('quizModal')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="videoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>Buscar Vídeo</span>
+        <button class="close-btn" onclick="closeModal('videoModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>Tema:</label>
+        <input type="text" class="form-control" id="videoTema" placeholder="Mitocôndria">
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="buscarVideo()">Buscar</button>
+        <button class="btn btn-secondary" onclick="closeModal('videoModal')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="slideModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>Criar Slides</span>
+        <button class="close-btn" onclick="closeModal('slideModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>Matéria:</label>
+        <input type="text" class="form-control" id="slideMateria" placeholder="Biologia">
+      </div>
+      <div class="form-group">
+        <label>Tema:</label>
+        <input type="text" class="form-control" id="slideTema" placeholder="Fotossíntese">
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="criarSlides()">Criar</button>
+        <button class="btn btn-secondary" onclick="closeModal('slideModal')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY = "AIzaSyDH9Tb5po8Om-_AsAYXLvjOsJPNS_467Bg";
+    const chatContainer = document.getElementById('chat');
+
+    // Função para adicionar mensagens
+    function addMessage(content, isUser = false) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+      messageDiv.innerHTML = `
+        <div class="avatar"><i class="fas fa-${isUser ? 'user' : 'robot'}"></i></div>
+        <div class="message-content">${content}</div>
+      `;
+      chatContainer.appendChild(messageDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Função para criar indicador de "digitando"
+    function createTypingIndicator() {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'message bot';
+      typingDiv.innerHTML = `
+        <div class="avatar"><i class="fas fa-robot"></i></div>
+        <div class="typing-indicator">
+          <span>IA está digitando</span>
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      `;
+      return typingDiv;
+    }
+
+    async function sendApiRequest(prompt, responseType) {
+      try {
+        let systemPrompt = "";
+        
+        if (responseType === 'simple') {
+          systemPrompt = "Responda de forma curta e direta, sem textos longos.";
+        } else {
+          systemPrompt = "Dê respostas inteligentes e práticas, sem enrolar.";
+        }
+
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: systemPrompt + "\n\n" + prompt }] }]
+          })
+        });
+
+        const data = await res.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta.';
+      } catch (error) {
+        return 'Erro na conexão.';
+      }
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('message-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+      
+      addMessage(msg, true);
+      input.value = '';
+      
+      // Detecta tipo de mensagem
+      const msgLower = msg.toLowerCase();
+      
+      // Respostas rápidas para cumprimentos simples
+      if (msgLower === 'oi' || msgLower === 'olá' || msgLower === 'ola' || msgLower === 'hey' || msgLower === 'e aí') {
+        addMessage("Oi! Qual sua dúvida?");
+        return;
+      }
+      
+      // Para perguntas relevantes - mostrar animação
+      const typingIndicator = createTypingIndicator();
+      chatContainer.appendChild(typingIndicator);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      
+      try {
+        const res = await sendApiRequest(msg, 'intelligent');
+        chatContainer.removeChild(typingIndicator);
+        addMessage(res);
+      } catch (error) {
+        chatContainer.removeChild(typingIndicator);
+        addMessage('Erro na conexão. Tente novamente.');
+      }
+    }
+
+    async function gerarResumo() {
+      const materia = document.getElementById('resumoMateria').value;
+      const tema = document.getElementById('resumoTema').value;
+      const linhas = document.getElementById('resumoLinhas').value;
+      
+      if (!materia || !tema || !linhas) {
+        alert('Preencha todos os campos');
+        return;
+      }
+      
+      closeModal('resumoModal');
+      
+      const typingIndicator = createTypingIndicator();
+      chatContainer.appendChild(typingIndicator);
+      
+      const res = await sendApiRequest(
+        `Crie um resumo de ${linhas} linhas sobre ${tema} de ${materia} com explicações claras.`,
+        'intelligent'
+      );
+      
+      chatContainer.removeChild(typingIndicator);
+      addMessage(res);
+    }
+
+    async function resolverEx() {
+      const materia = document.getElementById('exercicioMateria').value;
+      const texto = document.getElementById('exercicioTexto').value;
+      
+      if (!materia || !texto) {
+        alert('Preencha todos os campos');
+        return;
+      }
+      
+      closeModal('exercicioModal');
+      
+      const typingIndicator = createTypingIndicator();
+      chatContainer.appendChild(typingIndicator);
+      
+      const res = await sendApiRequest(
+        `Resolva passo a passo: ${texto} de ${materia} com explicações claras.`,
+        'intelligent'
+      );
+      
+      chatContainer.removeChild(typingIndicator);
+      addMessage(res);
+    }
+
+    async function gerarQuiz() {
+      const materia = document.getElementById('quizMateria').value;
+      const tema = document.getElementById('quizTema').value;
+      const qtd = document.getElementById('quizQtd').value;
+      
+      if (!materia || !tema || !qtd) {
+        alert('Preencha todos os campos');
+        return;
+      }
+      
+      closeModal('quizModal');
+      
+      const typingIndicator = createTypingIndicator();
+      chatContainer.appendChild(typingIndicator);
+      
+      const res = await sendApiRequest(
+        `Crie ${qtd} perguntas de quiz sobre ${tema} de ${materia} com explicações.`,
+        'intelligent'
+      );
+      
+      chatContainer.removeChild(typingIndicator);
+      addMessage(res);
+    }
+
+    function buscarVideo() {
+      const tema = document.getElementById('videoTema').value;
+      if (!tema) {
+        alert('Digite um tema');
+        return;
+      }
+      closeModal('videoModal');
+      const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(tema)}`;
+      addMessage(`📹 <a href="${url}" target="_blank">${url}</a>`);
+    }
+
+    async function criarSlides() {
+      const materia = document.getElementById('slideMateria').value;
+      const tema = document.getElementById('slideTema').value;
+      
+      if (!materia || !tema) {
+        alert('Preencha todos os campos');
+        return;
+      }
+      
+      closeModal('slideModal');
+      
+      const typingIndicator = createTypingIndicator();
+      chatContainer.appendChild(typingIndicator);
+      
+      const res = await sendApiRequest(
+        `Crie 4 slides curtos sobre ${tema} de ${materia} com explicações claras.`,
+        'intelligent'
+      );
+      
+      chatContainer.removeChild(typingIndicator);
+      addMessage(res);
+    }
+
+    function openModal(id) {
+      document.getElementById('floatingMenu').classList.remove('show');
+      document.getElementById(id + 'Modal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function toggleMenu() {
+      const menu = document.getElementById('floatingMenu');
+      menu.classList.toggle('show');
+    }
+
+    async function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64data = e.target.result.split(',')[1];
+        
+        const typingIndicator = createTypingIndicator();
+        chatContainer.appendChild(typingIndicator);
+        
+        const res = await sendApiRequest('Analise esta imagem e resolva a questão mostrada.', 'intelligent');
+        
+        chatContainer.removeChild(typingIndicator);
+        addMessage(res);
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.fab-btn') && !e.target.closest('.floating-menu')) {
+        document.getElementById('floatingMenu').classList.remove('show');
+      }
+    });
+
+    document.getElementById('message-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
